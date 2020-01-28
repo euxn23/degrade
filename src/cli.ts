@@ -1,28 +1,35 @@
 #!/usr/bin/env node
-import { rf } from './rf'
-import { rt } from './rt'
-import consola from 'consola'
+import { rf } from './rf';
+import { rt } from './rt';
+import consola from 'consola';
 
-const command = process.argv[2]
-const argv = process.argv.filter((_, i) => i > 2)
+const command = process.argv[2];
+const argv = process.argv.filter((_, i) => i > 2);
 
 async function run() {
   switch (command) {
     case 'rf': {
-      await rf(argv)
-      break
+      await rf(argv).catch(e => {
+        throw new Error(e);
+      });
+      break;
     }
 
     case 'rt': {
-      await rt(argv)
-      break
+      await rt(argv).catch(e => {
+        throw new Error(e);
+      });
+      break;
     }
 
     default: {
-      consola.error(`Missing command '${command}'`)
-      return process.exit(1)
+      throw new Error(`Missing command '${command}'`);
     }
   }
 }
 
-run()
+run().catch(e => {
+  const message = e instanceof Error ? e.message : e?.text || e;
+  consola.error(message);
+  process.exit(1);
+});
